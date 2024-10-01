@@ -74,5 +74,3 @@ Contributions are welcome! If you'd like to contribute to this project, please f
 - [Express.js](https://expressjs.com/) for the backend framework.
 - [React.js](https://reactjs.org/) for building the frontend.
 - [Tailwind CSS](https://tailwindcss.com/) for styling.
-```
-
