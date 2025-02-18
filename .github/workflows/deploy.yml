@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16" # Use the Node.js version of your choice
+          node-version: "18" # Use the Node.js version of your choice
 
       - name: Install frontend dependencies
         run: |
@@ -32,7 +32,7 @@ jobs:
           npm run build  # Assuming the build script is configured in package.json
 
       - name: Upload frontend build artifacts
-        uses: actions/upload-artifact@v3 # Updated to v3
+        uses: actions/upload-artifact@latest # Using the latest version
         with:
           name: frontend-build
           path: client/dist # Upload the dist folder
@@ -43,7 +43,7 @@ jobs:
           npm install
 
       - name: Upload backend artifacts
-        uses: actions/upload-artifact@v3 # Updated to v3
+        uses: actions/upload-artifact@latest # Using the latest version
         with:
           name: backend
           path: server
@@ -55,14 +55,19 @@ jobs:
       - name: Checkout code from GitHub
         uses: actions/checkout@v2
 
+      - name: Decode EC2 SSH Private Key
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 --decode > private_key.pem
+          chmod 600 private_key.pem  # Set the correct permissions for the private key
+
       - name: Download frontend build artifacts
-        uses: actions/download-artifact@v3 # Updated to v3
+        uses: actions/download-artifact@latest # Using the latest version
         with:
           name: frontend-build
 
       - name: Deploy frontend to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             # On EC2, remove the old build and copy the new one
             sudo rm -rf /var/www/html/*
             sudo cp -r ~/frontend-build/* /var/www/html/
@@ -70,13 +75,13 @@ jobs:
           EOF
 
       - name: Download backend artifacts
-        uses: actions/download-artifact@v3 # Updated to v3
+        uses: actions/download-artifact@latest # Using the latest version
         with:
           name: backend
 
       - name: Deploy backend to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             # On EC2, navigate to backend directory, install dependencies and start PM2
             cd ~/server  # Ensure you're in the backend directory
             npm install
