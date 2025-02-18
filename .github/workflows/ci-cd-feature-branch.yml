@@ -1,0 +1,63 @@
+name: CI for Feature Branches
+
+on:
+  push:
+    branches:
+      - frontend-1
+      - frontend-2
+      - backend-1
+      - backend-2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+
+      - name: Install dependencies for frontend
+        run: |
+          cd frontend
+          npm install
+
+      - name: Install dependencies for backend
+        run: |
+          cd backend
+          npm install
+
+      - name: Run tests for frontend
+        run: |
+          cd frontend
+          npm test
+
+      - name: Run tests for backend
+        run: |
+          cd backend
+          npm test
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Build backend
+        run: |
+          cd backend
+          npm run build
+
+      - name: Merge feature branch into staging
+        run: |
+          git fetch origin staging
+          git checkout staging
+          git merge ${{ github.ref }} --no-ff -m "Merge feature branch into staging"
+          git push origin staging
+
+      - name: Create a commit status for feature branch merge
+        run: |
+          echo "The feature branch was successfully merged into staging!"

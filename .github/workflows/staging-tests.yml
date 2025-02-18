@@ -1,0 +1,56 @@
+name: Staging Tests
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+
+      - name: Install dependencies for frontend
+        run: |
+          cd frontend
+          npm install
+
+      - name: Install dependencies for backend
+        run: |
+          cd backend
+          npm install
+
+      - name: Run tests for frontend
+        run: |
+          cd frontend
+          npm test
+
+      - name: Run tests for backend
+        run: |
+          cd backend
+          npm test
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Build backend
+        run: |
+          cd backend
+          npm run build
+
+      - name: Merge into Testing Branch if tests pass
+        run: |
+          git fetch origin testing
+          git checkout testing
+          git merge staging --no-ff -m "Merge staging into testing"
+          git push origin testing
