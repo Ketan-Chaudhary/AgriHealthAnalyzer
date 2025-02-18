@@ -6,7 +6,7 @@ on:
       - main # Trigger on push to the main branch, change if you use another branch
   pull_request:
     branches:
-      - main # Trigger on PR to the main branch
+      - main # Trigger on PR to the main
 
 jobs:
   build:
