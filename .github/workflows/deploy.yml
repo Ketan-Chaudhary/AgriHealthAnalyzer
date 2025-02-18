@@ -65,13 +65,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             # Clone the client (frontend) and server (backend) repositories
-            cd ~
-            if [ ! -d "client" ]; then
-              git clone https://github.com/Ketan-Chaudhary/AgriHealthAnalyzer.git client
-            fi
-            if [ ! -d "server" ]; then
-              git clone https://github.com/Ketan-Chaudhary/AgriHealthAnalyzer.git server
-            fi
+           git clone https://github.com/Ketan-Chaudhary/AgriHealthAnalyzer.git
 
             # Go to the client directory, install dependencies, and build
             cd ~/client
