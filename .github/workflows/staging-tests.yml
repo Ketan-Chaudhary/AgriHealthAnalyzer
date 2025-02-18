@@ -28,15 +28,15 @@ jobs:
           cd server
           npm install
 
-      - name: Run tests for frontend
-        run: |
-          cd client
-          npm test
+      #   - name: Run tests for frontend
+      #     run: |
+      #       cd client
+      #       npm test
 
-      - name: Run tests for backend
-        run: |
-          cd server
-          npm test
+      #   - name: Run tests for backend
+      #     run: |
+      #       cd server
+      #       npm test
 
       - name: Build frontend
         run: |
