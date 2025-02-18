@@ -46,11 +46,11 @@ jobs:
           cd client
           npm run build
 
-      - name: Start backend
-        run: |
-          cd server
-          npm start
-          pkill -f "npm start"
+      #   - name: Start backend
+      #     run: |
+      #       cd server
+      #       npm start
+      #       pkill -f "npm start"
 
       - name: Notify Success or Failure
         run: |

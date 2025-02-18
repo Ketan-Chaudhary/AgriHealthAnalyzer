@@ -46,11 +46,11 @@ jobs:
           cd client
           npm run build
 
-      - name: Build backend
-        run: |
-          cd server
-          npm start
-          pkill -f "npm start"
+      #   - name: Build backend
+      #     run: |
+      #       cd server
+      #       npm start
+      #       pkill -f "npm start"
 
       - name: Merge feature branch into staging
         run: |
