@@ -83,9 +83,5 @@ jobs:
           git checkout staging
           git config --global user.email "ketanchaudharypoonia@gmail.com"
           git config --global user.name "Ketan-Chaudhary"
-          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch ${{ github.head_ref }} into staging"
-          if [ $? -ne 0 ]; then
-              echo "Merge conflict detected, aborting merge."
-              exit 1
-          fi
+          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -X theirs -m "Merge feature branch ${{ github.head_ref }} into staging"
           git push https://github-actions:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} staging
