@@ -40,7 +40,7 @@ jobs:
 
       - name: Upload frontend build to S3
         run: |
-          aws s3 cp client/dist s3://your-bucket-name/frontend-build/ --recursive
+          aws s3 cp client/dist s3://bekyanamerakhubhai/frontend-build/ --recursive
 
       - name: Install backend dependencies
         run: |
@@ -49,7 +49,7 @@ jobs:
 
       - name: Upload backend to S3
         run: |
-          aws s3 cp server/ s3://your-bucket-name/backend/ --recursive
+          aws s3 cp server/ s3://bekyanamerakhubhai/backend/ --recursive
 
   deploy:
     runs-on: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
 
       - name: Download frontend build from S3
         run: |
-          aws s3 cp s3://your-bucket-name/frontend-build/ ./frontend-build/ --recursive
+          aws s3 cp s3://bekyanamerakhubhai/frontend-build/ ./frontend-build/ --recursive
 
       - name: Deploy frontend to EC2
         run: |
@@ -85,7 +85,7 @@ jobs:
 
       - name: Download backend from S3
         run: |
-          aws s3 cp s3://your-bucket-name/backend/ ./backend/ --recursive
+          aws s3 cp s3://bekyanamerakhubhai/backend/ ./backend/ --recursive
 
       - name: Deploy backend to EC2
         run: |
