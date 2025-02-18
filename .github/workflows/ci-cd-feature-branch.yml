@@ -50,6 +50,7 @@ jobs:
         run: |
           cd server
           npm start
+          pkill -f "npm start"
 
       - name: Merge feature branch into staging
         run: |
