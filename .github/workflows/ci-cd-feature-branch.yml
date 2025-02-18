@@ -49,15 +49,14 @@ jobs:
       #   - name: Build backend
       #     run: |
       #       cd server
-      #       npm start
-      #       pkill -f "npm start"
+      #       npm run build
 
       - name: Merge feature branch into staging
         run: |
           git fetch origin staging
           git checkout staging
-          git merge ${{ github.ref }} --no-ff -m "Merge feature branch into staging"
-          git push origin staging
+          git merge ${{ github.ref }} --no-ff -m "Merge feature branch ${{ github.head_ref }} into staging"
+          git push https://github-actions:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} staging
 
       - name: Create a commit status for feature branch merge
         run: |
