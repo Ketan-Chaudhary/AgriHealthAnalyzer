@@ -23,33 +23,33 @@ jobs:
 
       - name: Install dependencies for frontend
         run: |
-          cd frontend
+          cd client
           npm install
 
       - name: Install dependencies for backend
         run: |
-          cd backend
+          cd server
           npm install
 
       - name: Run tests for frontend
         run: |
-          cd frontend
+          cd client
           npm test
 
       - name: Run tests for backend
         run: |
-          cd backend
+          cd server
           npm test
 
       - name: Build frontend
         run: |
-          cd frontend
+          cd client
           npm run build
 
       - name: Build backend
         run: |
-          cd backend
-          npm run build
+          cd server
+          npm start
 
       - name: Notify Success or Failure
         run: |
