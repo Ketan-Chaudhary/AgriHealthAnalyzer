@@ -61,9 +61,18 @@ jobs:
       #   - name: Create a commit status for feature branch merge
       #     run: |
       #       echo "The feature branch was successfully merged into staging!"
+
+      #   - name: Merge feature branch into staging
+      #     run: |
+      #       git fetch origin staging
+      #       git checkout staging
+      #       git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch ${{ github.head_ref }} into staging"
+      #       git push https://github-actions:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} staging
       - name: Merge feature branch into staging
         run: |
           git fetch origin staging
           git checkout staging
+          git config --global user.email "ketanchaudharypoonia@gmail.com"
+          git config --global user.name "Ketan-Chaudhary"
           git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch ${{ github.head_ref }} into staging"
           git push https://github-actions:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} staging
