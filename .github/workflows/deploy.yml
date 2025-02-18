@@ -60,25 +60,37 @@ jobs:
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 --decode > private_key.pem
           chmod 600 private_key.pem  # Set the correct permissions for the private key
 
-      - name: Deploy frontend to EC2
+      # Step 3: SSH into EC2 and clone the repositories
+      - name: Clone repositories to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-              # Ensure you're in the correct directory
-              cd ~/client  # Navigate to the frontend directory
-              npm install
-              npm run build  # Rebuild the frontend if necessary
-              sudo rm -rf /var/www/html/*  # Remove old build files
-              sudo cp -r ~/client/dist/* /var/www/html/  # Copy new build to Nginx directory
-              sudo systemctl restart nginx  # Restart Nginx to serve the new build
+            # Clone the client (frontend) and server (backend) repositories
+            cd ~
+            if [ ! -d "client" ]; then
+              git clone https://github.com/Ketan-Chaudhary/AgriHealthAnalyzer.git client
+            fi
+            if [ ! -d "server" ]; then
+              git clone https://github.com/Ketan-Chaudhary/AgriHealthAnalyzer.git server
+            fi
+
+            # Go to the client directory, install dependencies, and build
+            cd ~/client
+            npm install
+            npm run build  # Build the frontend (Vite React)
+            sudo rm -rf /var/www/html/*  # Remove old files in Nginx directory
+            sudo cp -r ~/client/dist/* /var/www/html/  # Copy new build to Nginx directory
+
+            # Restart Nginx to serve the new frontend build
+            sudo systemctl restart nginx
+
+            # Go to the server directory, install dependencies, and start backend
+            cd ~/server
+            npm install
+            pm2 stop backend || true  # Stop the existing process if it exists
+            pm2 start server.js --name backend  # Start your backend process with PM2
+            pm2 save  # Save PM2 process list to restart on server reboot
           EOF
 
-      - name: Deploy backend to EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-              # On EC2, navigate to backend directory, install dependencies and start PM2
-              cd ~/server  # Ensure you're in the backend directory
-              npm install
-              pm2 stop backend || true  # Stop the existing process if it exists
-              pm2 start server.js --name backend  # Start your backend process with PM2
-              pm2 save  # Save PM2 process list to restart on server reboot
-          EOF
+      # Step 4: Clean up private key
+      - name: Clean up private key
+        run: rm -f private_key.pem
