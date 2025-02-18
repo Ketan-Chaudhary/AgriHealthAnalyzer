@@ -60,25 +60,28 @@ jobs:
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 --decode > private_key.pem
           chmod 600 private_key.pem  # Set the correct permissions for the private key
 
-      # Step 3: SSH into EC2 and clone the repositories
-      - name: Clone repositories to EC2
+      # Step 3: SSH into EC2 and clone the full repository
+      - name: Clone repository to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-            # Clone the client (frontend) and server (backend) repositories
-           git clone https://github.com/Ketan-Chaudhary/AgriHealthAnalyzer.git
+            # Clone the entire repository into a folder (same as the repo name, AgriHealthAnalyzer)
+            cd ~
+            if [ ! -d "AgriHealthAnalyzer" ]; then
+              git clone https://github.com/Ketan-Chaudhary/AgriHealthAnalyzer.git
+            fi
 
             # Go to the client directory, install dependencies, and build
-            cd ~/client
+            cd ~/AgriHealthAnalyzer/client
             npm install
             npm run build  # Build the frontend (Vite React)
             sudo rm -rf /var/www/html/*  # Remove old files in Nginx directory
-            sudo cp -r ~/client/dist/* /var/www/html/  # Copy new build to Nginx directory
+            sudo cp -r ~/AgriHealthAnalyzer/client/dist/* /var/www/html/  # Copy new build to Nginx directory
 
             # Restart Nginx to serve the new frontend build
             sudo systemctl restart nginx
 
             # Go to the server directory, install dependencies, and start backend
-            cd ~/server
+            cd ~/AgriHealthAnalyzer/server
             npm install
             pm2 stop backend || true  # Stop the existing process if it exists
             pm2 start server.js --name backend  # Start your backend process with PM2
