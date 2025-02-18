@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "18" # Use the Node.js version of your choice
+          node-version: "20" # Use the Node.js version of your choice
 
       - name: Install frontend dependencies
         run: |
@@ -32,7 +32,7 @@ jobs:
           npm run build  # Assuming the build script is configured in package.json
 
       - name: Upload frontend build artifacts
-        uses: actions/upload-artifact@latest # Using the latest version
+        uses: actions/upload-artifact@v3.1.2 # Using v3.1.2 as the latest stable version
         with:
           name: frontend-build
           path: client/dist # Upload the dist folder
@@ -43,7 +43,7 @@ jobs:
           npm install
 
       - name: Upload backend artifacts
-        uses: actions/upload-artifact@latest # Using the latest version
+        uses: actions/upload-artifact@v3.1.2 # Using v3.1.2 as the latest stable version
         with:
           name: backend
           path: server
@@ -61,7 +61,7 @@ jobs:
           chmod 600 private_key.pem  # Set the correct permissions for the private key
 
       - name: Download frontend build artifacts
-        uses: actions/download-artifact@latest # Using the latest version
+        uses: actions/download-artifact@v3.1.2 # Using v3.1.2 as the latest stable version
         with:
           name: frontend-build
 
@@ -75,7 +75,7 @@ jobs:
           EOF
 
       - name: Download backend artifacts
-        uses: actions/download-artifact@latest # Using the latest version
+        uses: actions/download-artifact@v3.1.2 # Using v3.1.2 as the latest stable version
         with:
           name: backend
 
