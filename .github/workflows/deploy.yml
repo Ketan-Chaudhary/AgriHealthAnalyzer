@@ -31,22 +31,18 @@ jobs:
           cd client  # Navigate to frontend folder
           npm run build  # Assuming the build script is configured in package.json
 
-      - name: Upload frontend build artifacts
-        uses: actions/upload-artifact@v3.1.2 # Using v3.1.2 as the latest stable version
-        with:
-          name: frontend-build
-          path: client/dist # Upload the dist folder
+      - name: Upload frontend build to S3
+        run: |
+          aws s3 cp client/dist s3://abekyanamerakhubhai/frontend-build/ --recursive
 
       - name: Install backend dependencies
         run: |
           cd server  # Navigate to backend directory
           npm install
 
-      - name: Upload backend artifacts
-        uses: actions/upload-artifact@v3.1.2 # Using v3.1.2 as the latest stable version
-        with:
-          name: backend
-          path: server
+      - name: Upload backend to S3
+        run: |
+          aws s3 cp server/ s3://abekyanamerakhubhai/backend/ --recursive
 
   deploy:
     runs-on: ubuntu-latest
@@ -60,10 +56,9 @@ jobs:
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 --decode > private_key.pem
           chmod 600 private_key.pem  # Set the correct permissions for the private key
 
-      - name: Download frontend build artifacts
-        uses: actions/download-artifact@v3.1.2 # Using v3.1.2 as the latest stable version
-        with:
-          name: frontend-build
+      - name: Download frontend build from S3
+        run: |
+          aws s3 cp s3://your-bucket-name/frontend-build/ ./frontend-build/ --recursive
 
       - name: Deploy frontend to EC2
         run: |
@@ -74,10 +69,9 @@ jobs:
             sudo systemctl restart nginx  # Restart Nginx to serve new build
           EOF
 
-      - name: Download backend artifacts
-        uses: actions/download-artifact@v3.1.2 # Using v3.1.2 as the latest stable version
-        with:
-          name: backend
+      - name: Download backend from S3
+        run: |
+          aws s3 cp s3://your-bucket-name/backend/ ./backend/ --recursive
 
       - name: Deploy backend to EC2
         run: |
