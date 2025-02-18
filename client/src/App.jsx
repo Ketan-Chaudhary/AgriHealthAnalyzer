@@ -1,5 +1,6 @@
 import React from "react";
 import DiseaseDetectionForm from "./components/DiseaseDetectionForm";
+//test
 const App = () => {
   return (
     <div>
