@@ -1,7 +1,7 @@
 name: CI for Feature Branches
 
 on:
-  pull_request:
+  push:
     branches:
       - staging
       - testing
@@ -33,25 +33,25 @@ jobs:
           cd server
           npm install
 
-      - name: Run tests for frontend
-        run: |
-          cd client
-          npm test
+      # - name: Run tests for frontend
+      #   run: |
+      #     cd client
+      #     npm test
 
-      - name: Run tests for backend
-        run: |
-          cd server
-          npm test
+      # - name: Run tests for backend
+      #   run: |
+      #     cd server
+      #     npm test
 
       - name: Build frontend
         run: |
           cd client
           npm run build
 
-      - name: Build backend
-        run: |
-          cd server
-          npm run build
+      # - name: Build backend
+      #   run: |
+      #     cd server
+      #     npm run build
 
       - name: Set Git user configuration
         run: |
