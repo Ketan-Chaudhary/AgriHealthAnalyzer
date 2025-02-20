@@ -55,7 +55,7 @@ jobs:
         run: |
           git fetch origin staging
           git checkout staging
-          git merge ${{ github.ref }} --no-ff -m "Merge feature branch into staging"
+          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch into staging"
           git push origin staging
 
       - name: Create a commit status for feature branch merge
