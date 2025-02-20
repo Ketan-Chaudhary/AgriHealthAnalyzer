@@ -1,8 +1,10 @@
 name: CI for Feature Branches
 
 on:
-  push:
+  pull_request:
     branches:
+      - staging
+      - testing
       - frontend-1
       - frontend-2
       - backend-1
@@ -31,25 +33,26 @@ jobs:
           cd server
           npm install
 
-      #   - name: Run tests for frontend
-      #     run: |
-      #       cd client
-      #       npm test
+      - name: Run tests for frontend
+        run: |
+          cd client
+          npm test
 
-      #   - name: Run tests for backend
-      #     run: |
-      #       cd server
-      #       npm test
+      - name: Run tests for backend
+        run: |
+          cd server
+          npm test
 
       - name: Build frontend
         run: |
           cd client
           npm run build
 
-      #   - name: Build backend
-      #     run: |
-      #       cd server
-      #       npm run build
+      - name: Build backend
+        run: |
+          cd server
+          npm run build
+
       - name: Set Git user configuration
         run: |
           git config --global user.name "Ketan-Chaudhary"
@@ -59,7 +62,7 @@ jobs:
         run: |
           git fetch origin staging
           git checkout staging
-          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch into staging"
+          git merge ${{ github.head_ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch into staging"
           git push origin staging
 
       - name: Create a commit status for feature branch merge
