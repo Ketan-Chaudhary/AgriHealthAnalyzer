@@ -60,6 +60,15 @@ jobs:
           git fetch origin staging
           git checkout staging
           git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch into staging"
+      - name: Resolve merge conflicts (if any)
+        run: |
+          git diff --name-only --diff-filter=U  # Show unmerged files
+          git checkout --ours .  # Use 'ours' version (staging's version) to resolve conflicts
+          git add .  # Add resolved files
+          git commit -m "Resolved merge conflicts"
+
+      - name: Push changes to staging
+        run: |
           git push origin staging
 
       - name: Create a commit status for feature branch merge
