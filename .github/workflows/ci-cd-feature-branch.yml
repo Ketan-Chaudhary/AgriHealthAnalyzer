@@ -1,69 +1,122 @@
-name: CI for Feature Branches
+name: CI Pipeline
 
 on:
   push:
     branches:
       - frontend-*
-      - backend-*
+      - backend-1
+  workflow_dispatch:
 
 jobs:
-  build:
+  # First stage: Merge to Staging
+  merge-to-staging:
+    if: github.ref == 'refs/heads/frontend-1' || github.ref == 'refs/heads/backend-1'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          node-version: "20"
+          fetch-depth: 0
 
-      - name: Install dependencies for frontend
-        if: contains(github.ref, 'frontend')
-        run: |
-          cd client
-          npm install
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: Install dependencies for backend
-        if: contains(github.ref, 'backend')
-        run: |
-          cd server
-          npm install
+      - name: Install dependencies
+        run: npm ci
 
-      # - name: Run tests for frontend
-      #   if: contains(github.ref, 'frontend')
-      #   run: |
-      #     cd client
-      #     npm test
+      - name: Run tests
+        run: npm test
 
-      # - name: Run tests for backend
-      #   if: contains(github.ref, 'backend')
-      #   run: |
-      #     cd server
-      #     npm test
+      - name: Build project
+        run: npm run build
 
-      - name: Build frontend
-        if: contains(github.ref, 'frontend')
-        run: |
-          cd client
-          npm run build
-
-      # - name: Build backend
-      #   if: contains(github.ref, 'backend')
-      #   run: |
-      #     cd server
-      #     npm run build
-
-      - name: Set Git user configuration
+      - name: Merge to Staging
         run: |
           git config --global user.name "Ketan-Chaudhary"
-          git config --global user.email "Ketanchaudhaypoonia@gmail.com"
-
-      - name: Merge into staging branch
-        if: success()
-        run: |
-          git fetch origin staging
+          git config --global user.email "ketanchaudharypoonia@gmail.com"
           git checkout staging
-          git merge ${{ github.ref }} --no-ff -m "Automated merge of ${{ github.ref }} into staging"
-          git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git staging
+          git pull origin staging
+          git merge ${{ github.ref }} --no-ff -m "Merge ${{ github.ref }} into staging"
+          git push origin staging
+
+  # Second stage: Staging to Testing
+  staging-to-testing:
+    needs: merge-to-staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+          fetch-depth: 0
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build project
+        run: npm run build
+
+      - name: Merge to Testing
+        run: |
+          git config --global user.name "Ketan-Chaudhary"
+          git config --global user.email "ketanchaudharypoonia@gmail.com"
+          git checkout testing
+          git pull origin testing
+          git merge staging --no-ff -m "Merge staging into testing"
+          git push origin testing
+
+  # Final stage: Testing to Main
+  testing-to-main:
+    needs: staging-to-testing
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/testing'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: testing
+          fetch-depth: 0
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build project
+        run: npm run build
+
+      - name: Merge to Main
+        run: |
+          git config --global user.name "Ketan-Chaudhary"
+          git config --global user.email "ketanchaudharypoonia@gmail.com"
+          git checkout main
+          git pull origin main
+          git merge testing --no-ff -m "Merge testing into main"
+          git push origin main
