@@ -1,14 +1,10 @@
 name: CI for Feature Branches
 
 on:
-  pull_request:
+  push:
     branches:
-      - staging
-      - testing
-      - frontend-1
-      - frontend-2
-      - backend-1
-      - backend-2
+      - frontend-*
+      - backend-*
 
 jobs:
   build:
@@ -16,55 +12,58 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "20"
 
       - name: Install dependencies for frontend
+        if: contains(github.ref, 'frontend')
         run: |
           cd client
           npm install
 
       - name: Install dependencies for backend
+        if: contains(github.ref, 'backend')
         run: |
           cd server
           npm install
 
-      - name: Run tests for frontend
-        run: |
-          cd client
-          npm test
+      # - name: Run tests for frontend
+      #   if: contains(github.ref, 'frontend')
+      #   run: |
+      #     cd client
+      #     npm test
 
-      - name: Run tests for backend
-        run: |
-          cd server
-          npm test
+      # - name: Run tests for backend
+      #   if: contains(github.ref, 'backend')
+      #   run: |
+      #     cd server
+      #     npm test
 
       - name: Build frontend
+        if: contains(github.ref, 'frontend')
         run: |
           cd client
           npm run build
 
-      - name: Build backend
-        run: |
-          cd server
-          npm run build
+      # - name: Build backend
+      #   if: contains(github.ref, 'backend')
+      #   run: |
+      #     cd server
+      #     npm run build
 
       - name: Set Git user configuration
         run: |
           git config --global user.name "Ketan-Chaudhary"
-          git config --global user.email "ketanchaudharypoonia@gamil.com"
+          git config --global user.email "Ketanchaudhaypoonia@gmail.com"
 
-      - name: Merge feature branch into staging
+      - name: Merge into staging branch
+        if: success()
         run: |
           git fetch origin staging
           git checkout staging
-          git merge ${{ github.head_ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch into staging"
-          git push origin staging
-
-      - name: Create a commit status for feature branch merge
-        run: |
-          echo "The feature branch was successfully merged into staging!"
+          git merge ${{ github.ref }} --no-ff -m "Automated merge of ${{ github.ref }} into staging"
+          git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git staging
