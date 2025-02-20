@@ -50,13 +50,17 @@ jobs:
       #     run: |
       #       cd server
       #       npm run build
+      - name: Set Git user configuration
+        run: |
+          git config --global user.name "Ketan-Chaudhary"
+          git config --global user.email "ketanchaudharypoonia@gamil.com"
 
       - name: Merge feature branch into staging
         run: |
           git fetch origin staging
           git checkout staging
-          git merge ${{ github.ref }} --no-ff -m "Merge feature branch ${{ github.head_ref }} into staging"
-          git push https://github-actions:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} staging
+          git merge ${{ github.ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch into staging"
+          git push origin staging
 
       - name: Create a commit status for feature branch merge
         run: |
