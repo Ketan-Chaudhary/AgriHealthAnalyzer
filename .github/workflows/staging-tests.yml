@@ -55,7 +55,7 @@ jobs:
       #       git checkout testing
       #       git merge staging --no-ff -m "Merge staging into testing"
       #       git push origin testing
-      - name: Merge feature branch into staging
+      - name: Merge feature branch into testing
         run: |
           git fetch origin testing
           git checkout testing
