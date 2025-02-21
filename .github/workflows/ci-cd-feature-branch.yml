@@ -75,18 +75,9 @@ jobs:
           gh pr create --title "pull request" --body "pull" --base staging --head frontend-1
         env:
           GH_TOKEN: ${{ github.token }}
-
-      # - name: add changes to that
-      #   run: |
-      #     git checkout staging
-      #     git add .
-      #     git commit -m "add chages from other branch"
-      #     git push origin staging
-
-      # - name: create pull request third party action
-      #   uses: peter-evans/create-pull-request@v4
-      #   with:
-      #     base: frontend-1
-      #     branch: staging
-      #     title: "PR for staging"
-      #     body: "comment for the same"
+      - name: Approve Pull Request
+        run: |
+          pr_number=$(gh pr list --state open --base staging --head frontend-1 --json number -q '.[0].number')
+          gh pr review $pr_number --approve
+        env:
+          GH_TOKEN: ${{ github.token }}
