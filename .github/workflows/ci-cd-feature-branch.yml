@@ -71,7 +71,8 @@ jobs:
         run: |
           echo "The feature branch was successfully merged into staging!"
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        run: |
+          gh pr create --title "pull request" --body "pull" --base staging --head frontend-1
 
       # - name: add changes to that
       #   run: |
