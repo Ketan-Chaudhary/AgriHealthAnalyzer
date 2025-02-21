@@ -75,7 +75,8 @@ jobs:
         run: |
           git checkout staging 
           git add .
-          git push origin ${{ github.head_ref }}
+          git commit -m "add chages from other branch"
+          git push origin staging
 
       - name: create pull request third party action
         uses: peter-evans/create-pull-request@v4
