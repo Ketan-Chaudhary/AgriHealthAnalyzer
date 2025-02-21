@@ -10,6 +10,8 @@ on:
       - backend-1
       - backend-2
 
+#
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -68,3 +70,18 @@ jobs:
       - name: Create a commit status for feature branch merge
         run: |
           echo "The feature branch was successfully merged into staging!"
+
+      - name: add changes to that
+        run: |
+          git checkout staging 
+          git add .
+          git commit -m "add chages from other branch"
+          git push origin staging
+
+      - name: create pull request third party action
+        uses: peter-evans/create-pull-request@v4
+        with:
+          base: frontend-1
+          branch: staging
+          title: "PR for staging"
+          body: "comment for the same"
