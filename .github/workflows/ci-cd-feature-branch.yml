@@ -73,6 +73,8 @@ jobs:
       - name: Create Pull Request
         run: |
           gh pr create --title "pull request" --body "pull" --base staging --head frontend-1
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       # - name: add changes to that
       #   run: |
