@@ -1,0 +1,29 @@
+name: Auto Merge staging to testing
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  merge-to-testing:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Merge into Testing
+        run: |
+          git checkout testing
+          git merge ${{ github.ref_name }} --no-ff -m "Auto-merged ${{ github.ref_name }} into testing"
+          git push origin testing

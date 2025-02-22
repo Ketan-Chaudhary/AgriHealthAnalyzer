@@ -3,8 +3,8 @@ name: CI for Feature Branches
 on:
   push:
     branches:
-      - staging
-      - testing
+      # - staging
+      # - testing
       - frontend-1
       - frontend-2
       - backend-1
@@ -54,30 +54,3 @@ jobs:
       #   run: |
       #     cd server
       #     npm run build
-
-      - name: Set Git user configuration
-        run: |
-          git config --global user.name "Ketan-Chaudhary"
-          git config --global user.email "ketanchaudharypoonia@gamil.com"
-
-      - name: Merge feature branch into staging
-        run: |
-          git fetch origin staging
-          git checkout staging
-          git merge ${{ github.head_ref }} --no-ff --allow-unrelated-histories -m "Merge feature branch into staging"
-          git push origin staging
-
-      - name: Create a commit status for feature branch merge
-        run: |
-          echo "The feature branch was successfully merged into staging!"
-      - name: Create Pull Request
-        run: |
-          gh pr create --title "pull request" --body "pull" --base staging --head frontend-1
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - name: Approve Pull Request
-        run: |
-          pr_number=$(gh pr list --state open --base staging --head frontend-1 --json number -q '.[0].number')
-          gh pr review $pr_number --approve
-        env:
-          GH_TOKEN: ${{ github.token }}

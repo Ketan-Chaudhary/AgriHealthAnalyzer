@@ -42,26 +42,3 @@ jobs:
         run: |
           cd client
           npm run build
-
-      #   - name: Build backend
-      #     run: |
-      #       cd server
-      #       npm start
-      #       pkill -f "npm start"
-
-      #   - name: Merge into Testing Branch if tests pass
-      #     run: |
-      #       git fetch origin testing
-      #       git checkout testing
-      #       git merge staging --no-ff -m "Merge staging into testing"
-      #       git push origin testing
-      - name: Merge feature branch into staging
-        run: |
-          git fetch origin testing
-          git checkout testing
-          git merge ${{ github.ref }} --no-ff -m "Merge feature branch ${{ github.head_ref }} into testing"
-          git push https://github-actions:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} testing
-
-      - name: Create a commit status for feature branch merge
-        run: |
-          echo "The feature branch was successfully merged into staging!"

@@ -1,0 +1,30 @@
+name: Auto Merge Feature Branches to Staging
+
+on:
+  push:
+    branches:
+      - frontend-*
+      - backend-*
+
+jobs:
+  merge-to-staging:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Merge into Staging
+        run: |
+          git checkout staging
+          git merge ${{ github.ref_name }} --no-ff -m "Auto-merged ${{ github.ref_name }} into staging"
+          git push origin staging
