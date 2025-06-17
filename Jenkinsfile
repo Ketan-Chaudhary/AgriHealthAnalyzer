@@ -32,7 +32,7 @@ pipeline {
         stage('Build Frontend'){
             steps{
                 dir('client'){
-                    sh 'ls -la node_modules/.bin && which vite || echo "vite not found in PATH"'
+                    sh 'export PATH=./node_modules/.bin:$PATH'
                     sh 'npm run build'
                 }
             }
