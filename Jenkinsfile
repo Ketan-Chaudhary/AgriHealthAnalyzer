@@ -2,7 +2,7 @@ pipeline {
     agent any 
 
     environment {
-        NODE_ENV = 'production'
+        //NODE_ENV = 'production'
         PLANT_ID_API_KEY = credentials('plant-api-key')
     }
     
