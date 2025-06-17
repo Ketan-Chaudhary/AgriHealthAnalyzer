@@ -4,7 +4,6 @@ pipeline {
     environment {
         NODE_ENV = 'production'
         PLANT_ID_API_KEY = credentials('plant-api-key')
-        BRANCH_NAME = env.BRANCH_NAME
     }
     
     tools {
@@ -13,7 +12,7 @@ pipeline {
 
     stages{
         stage('Checkout Code'){
-            step{
+            steps{
                  git branch: "${BRANCH_NAME}", url: 'https://github.com/Ketan-Chaudhary/AgriHealthAnalyzer.git'
             }
         }
@@ -71,7 +70,7 @@ pipeline {
         failure{
             echo 'Pipeline Failed'
         }
-        sucess{
+        success{
             script{
                 if (BRANCH_NAME != 'main'){
                     echo "Branch '${BRANCH_NAME}' build and tested and safe to merge"
