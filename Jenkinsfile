@@ -33,7 +33,7 @@ pipeline {
             steps{
                 dir('client'){
                     sh 'ls -la node_modules/.bin && which vite || echo "vite not found in PATH"'
-                    sh 'npx run build'
+                    sh 'npm run build'
                 }
             }
         }
