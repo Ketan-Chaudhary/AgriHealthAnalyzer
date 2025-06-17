@@ -57,11 +57,9 @@ pipeline {
             }
             steps{
                 echo 'Building and Deploying Docker container'
-                sh ```
-                docker-compose down || true
-                docker-compose build
-                docker-compose up -d
-                ```
+                sh 'docker-compose down || true'
+                sh 'docker-compose build'
+                sh 'docker-compose up -d'
                 echo 'Deployment Successful'
             }
         }
