@@ -32,7 +32,7 @@ pipeline {
         stage('Build Frontend'){
             steps{
                 dir('client'){
-                    sh 'npm run build'
+                    sh 'npx run build'
                 }
             }
         }
