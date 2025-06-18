@@ -52,9 +52,9 @@ pipeline {
         }
         // After setup of DockerFile
         stage('Dockerize and Deploy') {
-            // when {
-            //     branch 'main'
-            // }
+            when {
+                branch 'main'
+            }
             steps{
                 echo 'Building and Deploying Docker container'
                 sh 'docker-compose down || true'
