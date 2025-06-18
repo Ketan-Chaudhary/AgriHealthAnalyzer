@@ -51,20 +51,18 @@ pipeline {
             }
         }
         // After setup of DockerFile
-        // stage('Dockerize and Deploy') {
-        //     when {
-        //         branch 'main'
-        //     }
-        //     steps{
-        //         echo 'Building and Deploying Docker container'
-        //         sh ```
-        //         docker-compose down || true
-        //         docker-compose build
-        //         docker-compose up -d
-        //         ```
-        //         echo 'Deployment Successful'
-        //     }
-        // }
+        stage('Dockerize and Deploy') {
+            when {
+                branch 'main'
+            }
+            steps{
+                echo 'Building and Deploying Docker container'
+                sh 'docker-compose down || true'
+                sh 'docker-compose build'
+                sh 'docker-compose up -d'
+                echo 'Deployment Successful'
+            }
+        }
     }
     
     post{
