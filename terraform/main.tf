@@ -223,6 +223,29 @@ resource "aws_security_group" "private_sg" {
   tags = { Name = "Private SG" }
 }
 
+# SG for Jump Server 
+resource "aws_security_group" "bastion_sg" {
+  name   = "bastion-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["<your-public-ip>/32"] # restrict to your IP
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "Bastion SG" }
+}
+
+
 # ------------------ Load Balancer ------------------
 # Create ALB in private subnet
 resource "aws_lb" "app_lb" {
@@ -298,4 +321,14 @@ resource "aws_autoscaling_group" "app_asg" {
     propagate_at_launch = true
   }
 }
+#--- Bastion Host (Jump Box) ---
+resource "aws_instance" "bastion" {
+  ami                    = var.ami_id
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.public.id
+  associate_public_ip_address = true
+  key_name               = var.ssh_key_name
+  security_groups        = [aws_security_group.bastion_sg.id]
 
+  tags = { Name = "Bastion Host" }
+}
