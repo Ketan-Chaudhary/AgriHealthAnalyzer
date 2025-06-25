@@ -19,6 +19,17 @@ resource "aws_subnet" "public" {
   tags = { Name = "public-subnet" }
 }
 
+#New Public subnet for load balancer 
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.3.0/24" # New CIDR block
+  availability_zone       = data.aws_availability_zones.available.names[1]
+  map_public_ip_on_launch = true
+
+  tags = { Name = "public-subnet-2" }
+}
+
+
 #Private subnet - no public IPs
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.main.id
@@ -64,6 +75,13 @@ resource "aws_route_table_association" "public_assoc" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
+
+# Associate the second public subnet with rt
+resource "aws_route_table_association" "public_assoc_2" {
+  subnet_id      = aws_subnet.public_2.id
+  route_table_id = aws_route_table.public.id
+}
+
 
 # Private route table - routes 0.0.0.0/0 to NAT Gateway
 resource "aws_route_table" "private" {
@@ -210,7 +228,7 @@ resource "aws_security_group" "private_sg" {
 resource "aws_lb" "app_lb" {
   name               = "app-lb"
   load_balancer_type = "application"
-  subnets            = [aws_subnet.public.id]
+  subnets            = [aws_subnet.public.id,aws_subnet.public_2.id]
   security_groups    = [aws_security_group.alb_sg.id]
 
   tags = { Name = "app-lb" }
