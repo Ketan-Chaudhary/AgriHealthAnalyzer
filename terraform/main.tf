@@ -122,6 +122,15 @@ resource "aws_network_acl" "public_nacl" {
     from_port  = 443
     to_port    = 443
   }
+  # Allow SSH
+  ingress {
+    rule_no    = 120
+    protocol   = "6"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 22
+    to_port    = 22
+  }
   # Allow all outbound
   egress {
     rule_no    = 100
