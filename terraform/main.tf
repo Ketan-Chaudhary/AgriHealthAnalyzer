@@ -19,6 +19,17 @@ resource "aws_subnet" "public" {
   tags = { Name = "public-subnet" }
 }
 
+#New Public subnet for load balancer 
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.3.0/24" # New CIDR block
+  availability_zone       = data.aws_availability_zones.available.names[1]
+  map_public_ip_on_launch = true
+
+  tags = { Name = "public-subnet-2" }
+}
+
+
 #Private subnet - no public IPs
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.main.id
@@ -65,6 +76,13 @@ resource "aws_route_table_association" "public_assoc" {
   route_table_id = aws_route_table.public.id
 }
 
+# Associate the second public subnet with rt
+resource "aws_route_table_association" "public_assoc_2" {
+  subnet_id      = aws_subnet.public_2.id
+  route_table_id = aws_route_table.public.id
+}
+
+
 # Private route table - routes 0.0.0.0/0 to NAT Gateway
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
@@ -103,6 +121,15 @@ resource "aws_network_acl" "public_nacl" {
     cidr_block = "0.0.0.0/0"
     from_port  = 443
     to_port    = 443
+  }
+  # Allow SSH
+  ingress {
+    rule_no    = 120
+    protocol   = "6"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 22
+    to_port    = 22
   }
   # Allow all outbound
   egress {
@@ -205,12 +232,35 @@ resource "aws_security_group" "private_sg" {
   tags = { Name = "Private SG" }
 }
 
+# SG for Jump Server 
+resource "aws_security_group" "bastion_sg" {
+  name   = "bastion-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "Bastion SG" }
+}
+
+
 # ------------------ Load Balancer ------------------
 # Create ALB in private subnet
 resource "aws_lb" "app_lb" {
   name               = "app-lb"
   load_balancer_type = "application"
-  subnets            = [aws_subnet.public.id]
+  subnets            = [aws_subnet.public.id,aws_subnet.public_2.id]
   security_groups    = [aws_security_group.alb_sg.id]
 
   tags = { Name = "app-lb" }
@@ -280,4 +330,14 @@ resource "aws_autoscaling_group" "app_asg" {
     propagate_at_launch = true
   }
 }
+#--- Bastion Host (Jump Box) ---
+resource "aws_instance" "bastion" {
+  ami                    = var.ami_id
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.public.id
+  associate_public_ip_address = true
+  key_name               = var.ssh_key_name
+  security_groups        = [aws_security_group.bastion_sg.id]
 
+  tags = { Name = "Bastion Host" }
+}
